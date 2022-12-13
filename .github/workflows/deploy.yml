@@ -11,14 +11,28 @@ jobs:
   test:
     environment: testing
     runs-on: ubuntu-latest
+    # The tests will now run using the specified container, the Docker Hub has a bunch of publicly available images that you can use
     container:
+      # Here we specify the Docker Image we wish to use for the job
       image: node:16
     env:
-      MONGODB_CONNECTION_PROTOCOL: mongodb+srv
-      MONGODB_CLUSTER_ADDRESS: cluster0.r9lnz9g.mongodb.net
-      MONGODB_USERNAME: ${{ secrets.MONGODB_USERNAME }}
-      MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
+      # We use this specific connection protocol as decribed in the Docked Hub documentation
+      MONGODB_CONNECTION_PROTOCOL: mongodb
+      # Given that we're running the job inside a container we can ue the label for the service we want to connect with
+      MONGODB_CLUSTER_ADDRESS: mongodb
+      MONGODB_USERNAME: root
+      MONGODB_PASSWORD: example
       PORT: 8080
+    # We can specify the services we wan to use for the job.
+    services:
+      # The key can be named anything we want, for now it will be mongodb
+      mongodb:
+        # Services always run in containers, thus we need to specify the image
+        image: mongo
+        # This specific image need env variables to function
+        env:
+          MONGO_INITDB_ROOT_USERNAME: root
+          MONGO_INITDB_ROOT_PASSWORD: example
     steps:
       - name: Get Code
         uses: actions/checkout@v3
